@@ -10,10 +10,10 @@ class MaskedCelebADataset(Dataset):
         super(MaskedCelebADataset, self).__init__()
         self.folder_name = folder_name
         if training:
-            meta_file = "train_" + meta_file
+            meta_file = "utils/train_celeba_meta.csv"
         else:
-            meta_file = "test_" + meta_file
-        self.meta = pd.read_csv(os.path.join(folder_name, meta_file))
+            meta_file = "utils/test_celeba_meta.csv"
+        self.meta = pd.read_csv(meta_file)
 
     def __len__(self):
         return self.meta.shape[0]

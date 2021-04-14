@@ -83,7 +83,7 @@ class Decoder(nn.Module):
         for n in self.conv_dict:
             x = F.upsample(x, scale_factor=2)
             x = torch.cat([feat_dict[n], x], dim=1)
-            print(x.shape)
+            # print(x.shape)
             x = self.conv_dict[n](x)
         # final output
         output = self.output_layer(x)
