@@ -18,8 +18,8 @@ def train(epoch, batch_size, use_gpu, save_interval, save_path, data_folder_name
     if use_gpu:
         device = torch.device("cuda:0")
 
-    train_dataset = MaskedCelebADataset(data_folder_name, meta_file)
-    test_dataset = MaskedCelebADataset(data_folder_name, meta_file, training=False)
+    train_dataset = MaskedCelebADataset("utils/", meta_file)
+    test_dataset = MaskedCelebADataset("utils/", meta_file, training=False)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)

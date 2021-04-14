@@ -13,7 +13,7 @@ class MaskedCelebADataset(Dataset):
             meta_file = "train_" + meta_file
         else:
             meta_file = "test_" + meta_file
-        self.meta = pd.read_csv(meta_file)
+        self.meta = pd.read_csv(os.path.join(folder_name, meta_file))
 
     def __len__(self):
         return self.meta.shape[0]
