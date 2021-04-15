@@ -176,13 +176,14 @@ def train(epoch, batch_size, use_gpu, save_interval, save_path, data_folder_name
             prior_loss = priorB * blossweight
 
             delta = (image - rgbim) * mask
-            appearance_loss = torch.sum(delta**2) * appweight # there is a division by 224*224 in the original paper
+            appearance_loss = torch.sum(delta**2) / 64**2 * appweight # there is a division by 224*224 in the original paper
 
             shading_loss = torch.sum(alpha**2) * Shadingweight
 
             sparsity_loss = torch.sum(Specularities) * sparseweight
 
             total_loss = prior_loss + appearance_loss + shading_loss + sparsity_loss
+            print("training loss: {}".format(total_loss))
 
             optim.zero_grad()
             total_loss.backward()

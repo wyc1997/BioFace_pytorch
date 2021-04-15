@@ -37,7 +37,7 @@ class IlluminationModel(nn.Module):
         illuminantF = illuminantF.transpose(0,1)
 
         dlayer_input = torch.zeros(CCT.shape[0], self.illumDNorm.shape[0] * self.illumDNorm.shape[1] + 1).cuda()
-        dlayer_input[:, 1:] = self.illumDNorm.view(self.illumDNorm.shape[0] * self.illumDNorm.shape[1]).unsqueeze(0).repeat_interleave(repeats=CCT.shape[0],dim=0)
+        dlayer_input[:, 1:] = self.illumDNorm.contiguous().view(self.illumDNorm.shape[0] * self.illumDNorm.shape[1]).unsqueeze(0).repeat_interleave(repeats=CCT.shape[0],dim=0)
         dlayer_input[:, 0] = CCT
         illuminantD = self.illuDLayer(dlayer_input)
         illuminantD = illuminantD * weightD.unsqueeze(1)
