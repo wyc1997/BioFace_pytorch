@@ -3,6 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 from torchsummary import summary
 from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
 
 from CNN import CNNEncoder, FullyConnectedRegressor, Decoder
 from data import MaskedCelebADataset
@@ -15,6 +16,8 @@ from physcial_model import IlluminationModel, camera_sensitivity_pca, ImageFroma
 def train(epoch, batch_size, use_gpu, save_interval, save_path, data_folder_name, meta_file, load_path=None):
     if use_gpu:
         device = torch.device("cuda:0")
+
+    writer = SummaryWriter('runs/{}.log'.format(save_path))
 
     celebA_image_avg = [129.1863, 104.7624, 93.5940]
     muim = torch.tensor(celebA_image_avg).view(1,3,1,1)
@@ -154,9 +157,10 @@ def train(epoch, batch_size, use_gpu, save_interval, save_path, data_folder_name
             sRGBIM = raw_to_rgb_model(b_1, IMWB)
 
             # scaling RGBim
-            scaleRGB = sRGBIM * 255
-            rgbim = scaleRGB - muim
-            
+            scaleRGB = sRGBIM * 255  
+            # rgbim = scaleRGB - muim  # why -mu of the dataset? if we are using reconstructed images as supervision this would cause a problem wouldn't it. 
+            rgbim = scaleRGB  # changed away from original implementation as all the blue and green channel are negative numbers
+
             gt_shading = gt_shading.unsqueeze(1)
             mask = mask.unsqueeze(1)
             scale = torch.sum(torch.sum((gt_shading * predicted_shading * mask), dim=2), dim=2) / \
@@ -175,7 +179,7 @@ def train(epoch, batch_size, use_gpu, save_interval, save_path, data_folder_name
             priorB = torch.sum(b_1 ** 2)
             prior_loss = priorB * blossweight
 
-            delta = (image - rgbim) * mask
+            delta = (image * 255 - rgbim) * mask
             appearance_loss = torch.sum(delta**2) / 64**2 * appweight # there is a division by 224*224 in the original paper
 
             shading_loss = torch.sum(alpha**2) * Shadingweight
@@ -183,7 +187,7 @@ def train(epoch, batch_size, use_gpu, save_interval, save_path, data_folder_name
             sparsity_loss = torch.sum(Specularities) * sparseweight
 
             total_loss = prior_loss + appearance_loss + shading_loss + sparsity_loss
-            print("training loss: {}".format(total_loss))
+            writer.add_scalar("training loss", total_loss, i * len(train_loader) + idx)
 
             optim.zero_grad()
             total_loss.backward()
