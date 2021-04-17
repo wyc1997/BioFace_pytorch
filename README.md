@@ -67,3 +67,7 @@ original image, reconstructed image, diffuse shading map, specular shading map, 
 * Seemed to flipped melanin map and heamoglobin map in the bio to physical model given the output result. 
 * Can be trained more but due to limited time and computation resources it didn't happen. 
 
+### Citation
+
+This work is based on the paper "BioFaceNet: Deep Biophysical Face Image Interpretation". The original implementation in github can be found [here](https://github.com/ssma502/BioFaces)
+
